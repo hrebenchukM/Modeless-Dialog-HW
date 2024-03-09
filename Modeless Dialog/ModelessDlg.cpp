@@ -107,7 +107,7 @@ void CModelessDialog::Cls_OnCommand(HWND hwnd, int id, HWND hwndCtl, UINT codeNo
 			string line;
 			while (getline(file, line))
 			{
-				size_t pos = line.find(' ');
+				auto pos = line.find(' ');
 				if (pos != string::npos)
 				{
 					string stored_login = line.substr(0, pos);

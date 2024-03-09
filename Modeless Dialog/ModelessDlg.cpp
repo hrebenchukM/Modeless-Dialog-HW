@@ -53,7 +53,7 @@ BOOL CModelessDialog::Cls_OnInitDialog(HWND hwnd, HWND hwndFocus, LPARAM lParam)
 
 void CModelessDialog::Cls_OnCommand(HWND hwnd, int id, HWND hwndCtl, UINT codeNotify)
 {
-	
+
 
 	switch (id)
 	{
@@ -98,38 +98,23 @@ void CModelessDialog::Cls_OnCommand(HWND hwnd, int id, HWND hwndCtl, UINT codeNo
 
 	case IDOK:
 	{
-		TCHAR login[100], password[100];
-		GetDlgItemText(hwnd, IDC_EDIT1LOGIN, login, 100);
-		GetDlgItemText(hwnd, IDC_EDIT2CODE, password, 100);
+		char login[100], password[100];
+		GetDlgItemTextA(hwnd, IDC_EDIT1LOGIN, login, 100);
+		GetDlgItemTextA(hwnd, IDC_EDIT2CODE, password, 100);
 
-		// Преобразуем TCHAR в wstring
-		wstring w_login(login);
-		wstring w_password(password);
+		bool found = false;
 
-
-		// Открываем файл для чтения
-		ifstream file("file.txt");
+		std::ifstream file("users.txt");
 		if (file.is_open())
 		{
-			bool found = false;
-			string line;
-			while (getline(file, line))
+			char stored_login[100], stored_password[100];
+			while (file >> stored_login >> stored_password)
 			{
-				auto pos = line.find(' ');
-				if (pos != string::npos)
+				// Проверяем совпадение введенного логина и пароля с данными из файла
+				if (strcmp(stored_login, login) == 0 && strcmp(stored_password, password) == 0)
 				{
-					string stored_login = line.substr(0, pos);
-					string stored_password = line.substr(pos + 1);
-
-
-					// Преобразуем stored_login и stored_password в wstring
-					wstring w_stored_login(stored_login.begin(), stored_login.end());
-					wstring w_stored_password(stored_password.begin(), stored_password.end());
-					if (w_stored_login == w_login && w_stored_password == w_password)
-					{
-						found = true;
-						break;
-					}
+					found = true;
+					break; 
 				}
 			}
 			file.close();
@@ -143,13 +128,14 @@ void CModelessDialog::Cls_OnCommand(HWND hwnd, int id, HWND hwndCtl, UINT codeNo
 				MessageBox(hwnd, TEXT("Неверный логин или пароль"), TEXT("Ошибка"), MB_OK | MB_ICONERROR);
 			}
 		}
+
 		else
 		{
 			MessageBox(hwnd, TEXT("Ошибка при открытии файла"), TEXT("Ошибка"), MB_OK | MB_ICONERROR);
 		}
 		EndDialog(hwnd, 0);
 	}
-	break;
+	  break;
 	}
 }
 
